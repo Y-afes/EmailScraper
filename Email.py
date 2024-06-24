@@ -9,9 +9,8 @@ from validate_email_address import validate_email
 
 continue_scanning = True
 
-
 VALID_DOMAINS = {"com", "org", "net", "edu", "gov", "mil", "int"}
-VALID_CC_TLDS = {"tr", "uk", "us", "de", "fr", "ru", "cn", "jp", "in"} 
+VALID_CC_TLDS = {"tr", "uk", "us", "de", "fr", "ru", "cn", "jp", "in"}
 
 def google_search(query):
     encoded_query = quote(query, safe='')
@@ -19,14 +18,14 @@ def google_search(query):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)  
     response.raise_for_status()
     return response.text
 
 def extract_emails_from_page(url):
     emails = set()
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)  
         response.raise_for_status()
 
         content = response.content.decode('utf-8', errors='ignore')
@@ -43,7 +42,7 @@ def extract_emails_from_page(url):
                 if is_valid_email_format(email):
                     emails.add(email.lower())
 
-    except requests.exceptions.RequestException:
+    except (requests.exceptions.RequestException, TimeoutError):
         pass
 
     return emails
@@ -131,3 +130,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+            
